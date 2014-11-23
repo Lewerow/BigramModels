@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE cesAna SYSTEM "xcesAnaIPI.dtd">
+<chunkList xmlns:xlink="http://www.w3.org/1999/xlink">
+ <chunk id="ch1" type="p">
+  <sentence>
+   <tok>
+    <orth>Pies</orth>
+    <lex disamb="1"><base>pies</base><ctag>subst:sg:nom:m2</ctag></lex>
+   </tok>
+   <tok>
+    <orth>je</orth>
+    <lex disamb="1"><base>on</base><ctag>ppron3:sg:acc:n:ter:akc:npraep</ctag></lex>
+   </tok>
+   <tok>
+    <orth>mięso</orth>
+    <lex disamb="1"><base>mięso</base><ctag>subst:sg:nom:n</ctag></lex>
+   </tok>
+  </sentence>
+ </chunk>
+</chunkList>
