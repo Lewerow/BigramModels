@@ -16,11 +16,10 @@ getters = {'orth' : get_orths, 'lex' : get_lemmas, 'ctag' : get_grammar}
 def execute():
   global getters
   parser = etree.parse(sys.argv[1])
-  tokens = parser.findall('//tok')
-  
+  tokens = parser.findall('.//tok')
+
   values = getters[sys.argv[2]](tokens)
-  print(' '.join(values))
+  print(' '.join(values).encode('utf8'))
 
 if __name__ == "__main__":
   execute()
-

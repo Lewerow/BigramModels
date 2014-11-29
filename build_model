@@ -1,0 +1,24 @@
+file=$1
+
+# Create OpenFst-style symbol table for the text tokens in input corporus.
+ngramsymbols $file >$file.syms
+
+# Convert symbol table to binary FAR archive
+farcompilestrings -symbols=$file.syms -keep_symbols=1 $file >$file.far
+# Optional print
+# farprintstrings $file.far
+
+# Create, normalize and smooth n-gram model.
+# Smoothing methods: witten_bell(default), absolute, katz, kneser_ney, presmoothed, unsmoothed
+ngramcount -order=2 $file.far >$file.cnts
+ngrammake -method=katz $file.cnts >$file.mod
+# Optional print
+# ngramprint --ARPA $file.mod
+# ngraminfo $file.mod
+
+# Prune model based on relative entropy
+# Different methods: count_pruning, Seymore
+ngramshrink -method=relative_entropy -theta=0.00015 $file.mod >$file.pru
+# Optional print
+# ngramprint --ARPA $file.pru
+# ngraminfo $file.pru
