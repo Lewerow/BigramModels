@@ -1,9 +1,7 @@
 import xml.etree.ElementTree as etree
 import sys
 import getopt
-
-def get_sequence_probability(w1, w2):
-    return 1.0
+import types
 
 def most_probable_variant(variants):
     max_word = variants[0][0]
@@ -17,13 +15,58 @@ def most_probable_variant(variants):
     return max_word
 
 def highest_probability_disambiguation(sequence):
-    return [most_probable_variant(variants) for variants in sequence]
+    # Lista jest posortowana
+    return [variants[0][0] for variants in sequence]
+
+def tag(word, preceeding_sequence):
+    return {'orth': word, 'base': word, 'ctag':'unknown'}
+
+def run_tagger(sequence):
+    already_tagged = []
+    for variants in sequence:
+        if isinstance(variants[0], types.StringTypes):
+           already_tagged.append((tag(variants[0], already_tagged), variants[1]))
+        else:
+            already_tagged.append([(tag(v[0], already_tagged), v[1]) for v in variants])
+
+    return already_tagged
+    
+
+def disambiguate_obvious_words(sequence):
+    obviousity_threshold = 0.8
+    return [variants[0] if variants[0][1] > obviousity_threshold else variants for variants in sequence]
+
+def disambiguate_words(sequence):
+    # result is a list of tuples -> (dictionary, probability) and lists of tuples -> (dictionary, probability)
+    # dictionary contains fields 'orth', 'base' and 'ctag'
+    disambiguated_obvious = disambiguate_obvious_words(sequence)
+    return run_tagger(disambiguated_obvious)
+
+def get_sequence_probability(w1, w2, token_type):
+    return 1.0
+
+def bigram_disambiguation(variants, last_disambiguated, token_type):
+    return most_probable_variant([(variant[0], get_sequence_probability(last_disambiguated, variant[0], token_type) * variant[1]) for variant in variants])
+
+def token_disambiguation(sequence, token_type):
+    global bigram_disambiguation
+    available_words = disambiguate_words(sequence)
+    empty_word = {'base': '', 'orth': '', 'ctag': ''}
+    disambiguated = [empty_word]
+    for i in range(0, len(available_words)):
+        if not type(available_words[i]) is list:
+            disambiguated.append(available_words[i][0])
+        else:
+            disambiguated.append(bigram_disambiguation(available_words[i], disambiguated[-1], token_type))
+
+    del disambiguated[0]
+    return [d['orth'] for d in disambiguated]
 
 def grammar_form_disambiguation(sequence):
-    return False
+    return token_disambiguation(sequence, 'ctag')
 
 def entropy_disambiguation(sequence):
-    return False
+    return token_disambiguation(sequence, 'base')
 
 disambiguation_strategies = {
     'highest_probability' : highest_probability_disambiguation, 
