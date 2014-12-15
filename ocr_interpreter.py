@@ -2,6 +2,7 @@ import xml.etree.ElementTree as etree
 import sys
 import getopt
 import types
+import subprocess
 
 def most_probable_variant(variants):
     max_word = variants[0][0]
@@ -19,7 +20,17 @@ def highest_probability_disambiguation(sequence):
     return [variants[0][0] for variants in sequence]
 
 def tag(word, preceeding_sequence):
-    return {'orth': word, 'base': word, 'ctag':'unknown'}
+    p = subprocess.Popen(" ".join(["echo", word, "|", "wcrft-app", "nkjp_e2", "-i", "txt", "-"]),
+                         stdout=subprocess.PIPE,
+                         shell=True)
+    tagged = p.stdout.read()
+    startbase = tagged.find("base") + 5
+    endbase = tagged.find("/base", startbase) - 1
+    base = tagged[startbase : endbase]
+    startctag = tagged.find("ctag", endbase) + 5
+    endctag = tagged.find("/ctag", startctag) - 1
+    ctag = tagged[startctag : endctag]
+    return {'orth': word, 'base': base, 'ctag': ctag}
 
 def run_tagger(sequence):
     already_tagged = []
@@ -28,7 +39,7 @@ def run_tagger(sequence):
            already_tagged.append((tag(variants[0], already_tagged), variants[1]))
         else:
             already_tagged.append([(tag(v[0], already_tagged), v[1]) for v in variants])
-
+    
     return already_tagged
     
 
@@ -112,9 +123,9 @@ if __name__ == "__main__":
 
     disambiguated = disambiguate_all(sys.argv[1], strategy)
 
-    for note in disambiguated:
-        print("\nEXPECTED:\n")
-        print(' '.join(note[0]).encode('utf8'))
-        print("\nACTUAL:\n")
-        print(' '.join(note[1]).encode('utf8'))
+    #for note in disambiguated:
+    #    print("\nEXPECTED:\n")
+    #    print(' '.join(note[0]).encode('utf8'))
+    #    print("\nACTUAL:\n")
+    #    print(' '.join(note[1]).encode('utf8'))
 
