@@ -13,13 +13,14 @@ def get_grammar(tokens):
 
 
 getters = {'orth' : get_orths, 'lex' : get_lemmas, 'ctag' : get_grammar}
-def execute():
+
+def execute(filename, token_type):
   global getters
-  parser = etree.parse(sys.argv[1])
+  parser = etree.parse(filename)
   tokens = parser.findall('.//tok')
 
-  values = getters[sys.argv[2]](tokens)
-  print(' '.join(values).encode('utf8'))
+  values = getters[token_type](tokens)
+  return ' '.join(values).encode('utf8')
 
 if __name__ == "__main__":
-  execute()
+  print(execute(sys.argv[1], sys.argv[2]))
