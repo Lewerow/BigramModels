@@ -62,20 +62,18 @@ def get_counts(input_file):
     #print("Counted")
 
 
-def build_model(input_file, method):
-    global models_dir
-
+def build_model(output_file, input_file, method):
     #print("Building model for " + input_file)
-    model = open(models_dir + input_file + ".mod", "w")
+    model = open(output_file, "w")
     subprocess.call(["ngrammake", "-method=" + method,
-                     input_file + ".cnts"], stdout=model)
+                     input_file], stdout=model)
     model.close()
     #print("Model built")
 
 def merge_model(main_model, merged, out):
     global counts_dir
     #print("Building model for " + input_file)
-    out_model = open(out)
+    out_model = open(out, "w")
     subprocess.call(["ngrammerge", main_model, counts_dir + merged], stdout=out_model)
     out_model.close()
     #print("Model built")
@@ -104,7 +102,7 @@ def execute():
     
     start_time = time.time()
     # create models for each file in input directory
-    for input_file in os.listdir(input_dir):
+    for input_file in os.listdir(input_dir)[:1000]:
         if how_many_done % 100 == 0:
             print("Already analyzed: " + str(how_many_done) + ". Currently analyzing file: " + input_file)
             print("Time taken: " + format_time(time.time() - start_time))
@@ -140,22 +138,22 @@ def execute():
         get_counts(input_file) 
 
 def merge_models():
-    global models_dir
+    global counts_dir
     global result_dir
     subprocess.call(["mkdir", "-p", result_dir])
     
-    files = os.listdir (models_dir)
+    files = os.listdir (counts_dir)
     starter = files.pop()
 
     main_model_names = ["main_model_1.cnts", "main_model_2.cnts"]
-    subprocess.call(["mv", models_dir + starter, result_dir + main_model_names[0]])
+    subprocess.call(["mv", counts_dir + starter, result_dir + main_model_names[0]])
     i = 0
     j = 1
 
     start_time = time.time()
     count = 0
     for input_file in files:
-        if count % 1000 == 0:
+        if count % 100 == 0:
             print("Already merged: " + str(count) + ". Currently merging file: " + input_file)
             print("Time taken: " + format_time(time.time() - start_time))
         # incorporate various models into main one
@@ -178,7 +176,7 @@ def merge_models():
     # Smoothing methods: witten_bell(default), absolute,
     # katz, kneser_ney, presmoothed, unsmoothed
     # save models in different directory
-    build_model(result_dir + "final_model.cnts", "katz")
+    build_model(result_dir + "final_model.mod", result_dir + "final_model.cnts", "katz")
  
 
 if __name__ == "__main__":
