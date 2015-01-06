@@ -102,7 +102,7 @@ def execute():
     
     start_time = time.time()
     # create models for each file in input directory
-    for input_file in os.listdir(input_dir)[:1000]:
+    for input_file in os.listdir(input_dir):
         if how_many_done % 100 == 0:
             print("Already analyzed: " + str(how_many_done) + ". Currently analyzing file: " + input_file)
             print("Time taken: " + format_time(time.time() - start_time))
@@ -187,4 +187,4 @@ if __name__ == "__main__":
     merge_models()
     merging = time.time()
 
-    print("Done everything. Building counts took: " + format_time(executing - starter) + ", merging and building model took: " + format_time(merging - executing) + ".\nIn total spent: " + format_time(merging - starter))
+    print("Done everything.\nBuilding counts took: " + format_time(executing - starter) + "\nMerging and building model took: " + format_time(merging - executing) + ".\nIn total spent: " + format_time(merging - starter))
