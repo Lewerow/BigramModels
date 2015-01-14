@@ -22,5 +22,13 @@ def execute(filename, token_type):
   values = getters[token_type](tokens)
   return ' '.join(values).encode('utf8')
 
+def from_string(string, token_type):
+  global getters
+  parser = etree.fromstring(string)
+  tokens = parser.findall('.//tok')
+  values = getters[token_type](tokens)
+
+  return ' '.join(values)
+
 if __name__ == "__main__":
   print(execute(sys.argv[1], sys.argv[2]))
