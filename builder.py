@@ -5,8 +5,7 @@ import sys
 def tag_files(input_base, input_file):
     print("Tagging file")
     subprocess.call(["wcrft-app", "nkjp_e2",
-                     "-i", "txt", input_file, "-O",
-                     input_base + ".xml"])
+                     "-i", "txt", input_file, "-m", "maca_config", "-O", input_base + ".xml"])
     print("File tagged")
 
 
